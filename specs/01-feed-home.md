@@ -1,6 +1,6 @@
 # SPEC 01 — Feed de la sala como Home (`/`)
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** ninguna
 > **Fecha:** 2026-11-10
 > **Objetivo:** Reproducir en `/` la pantalla `references/pantallas/feed.dc.html` de manera fiel con datos mock, sin autenticación ni base de datos, con degradación simple a móvil mediante drawer.
@@ -64,15 +64,15 @@ export const MOCK_SESSION = {
 
 ## Acceptance criteria
 
-- [ ] `/` muestra el copy exacto del mockup, incluidos los 3 textos de post, las 3 pills de tipo y el "Foto · pintando con témperas" en el post ACTIVIDAD.
-- [ ] Las pills usan los colores del design system: LOGRO `#3E9B6C`/`#CFEBD8`, ACTIVIDAD `#2E89A6`/`#C7E7F1`, ANUNCIO `#4E72C8`/`#CCD8F4`.
-- [ ] "Nueva publicación" usa el gradiente `#F4977E → #EE8164` con sombra del mockup.
-- [ ] Los títulos renderizan en Fredoka y el cuerpo en Nunito (fuentes self-hosted por `next/font`, sin parpadeo).
-- [ ] Ningún enlace navega: todos los `<a>` de la página son `href="#"`.
-- [ ] La imagen placeholder del post ACTIVIDAD es el recuadro punteado `#DBCDBA` del mockup, no una imagen real.
-- [ ] Con ancho < 768px el sidebar se convierte en drawer accesible por hamburguesa y el feed ocupa todo el ancho.
-- [ ] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan sin errores.
-- [ ] La captura guardada en `.playwright-mcp/feed.png` a ~1200px es visualmente equivalente a `references/screenshots/feed.png`.
+- [x] `/` muestra el copy exacto del mockup, incluidos los 3 textos de post, las 3 pills de tipo y el "Foto · pintando con témperas" en el post ACTIVIDAD. — ✅ `lib/mock-posts.ts:26-61` replica línea a línea `feed.dc.html` (3 cuerpos, audiencia, horas, likes/comentarios); render verificado en `.playwright-mcp/feed.png`.
+- [x] Las pills usan los colores del design system: LOGRO `#3E9B6C`/`#CFEBD8`, ACTIVIDAD `#2E89A6`/`#C7E7F1`, ANUNCIO `#4E72C8`/`#CCD8F4`. — ✅ Computado en vivo: `rgb(62,155,108)`/`rgb(207,235,216)`, `rgb(46,137,166)`/`rgb(199,231,241)`, `rgb(78,114,200)`/`rgb(204,216,244)`; tokens en `app/globals.css:32-37`.
+- [x] "Nueva publicación" usa el gradiente `#F4977E → #EE8164` con sombra del mockup. — ✅ Computado: `linear-gradient(in oklab, rgb(244,151,126), rgb(238,129,100))` (extremos exactos; Tailwind 4 interpola en oklab) + sombra `rgba(238,129,100,0.75) 0 8px 18px -8px` = `0 8px 18px -8px rgba(238,129,100,.75)` del mockup.
+- [x] Los títulos renderizan en Fredoka y el cuerpo en Nunito (fuentes self-hosted por `next/font`, sin parpadeo). — ✅ `app/layout.tsx:6-14`; en vivo `document.fonts.check` → `true` para ambas, h1 `Fredoka, "Fredoka Fallback"`, body `Nunito, "Nunito Fallback"`.
+- [x] Ningún enlace navega: todos los `<a>` de la página son `href="#"`. — ✅ 15/15 anchors con `href="#"` en el DOM (composer, logo, CTA, 4 nav, logout, 3×[foto, comentarios, editar]); sin `next/link` en `app/`.
+- [x] La imagen placeholder del post ACTIVIDAD es el recuadro punteado `#DBCDBA` del mockup, no una imagen real. — ✅ Computado: `border dashed rgb(219,205,186)` + bg `rgb(244,236,225)` (`#DBCDBA`/`#F4ECE1`), SVG + copy, sin `<img>`.
+- [x] Con ancho < 768px el sidebar se convierte en drawer accesible por hamburguesa y el feed ocupa todo el ancho. — ✅ Verificado en vivo a 500px: cerrado `translate: -100%` (off-screen), hamburguesa abre (`translate: 0px`, 248px, `aria-expanded=true`), Escape cierra (`aria-expanded=false`); capturas `.playwright-mcp/spec01-drawer-closed.png` y `spec01-drawer-open.png`.
+- [x] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan sin errores. — ✅ Los tres ejecutados sin warnings ni errores (build: ruta `/` prerenderizada estática).
+- [x] La captura guardada en `.playwright-mcp/feed.png` a ~1200px es visualmente equivalente a `references/screenshots/feed.png`. — ✅ 1200×800, equivalencia lado a lado (layout, copy, pills, gradiente, fuentes). Única divergencia: el corazón sale relleno siguiendo el HTML del mockup (fuente de verdad, `feed.dc.html:71` con `fill="#E0654A"`), mientras la captura de referencia lo muestra hueco; lo mismo ocurre con la inicial "C" del composer ("c" en la captura). El HTML manda.
 
 ## Decisions
 
