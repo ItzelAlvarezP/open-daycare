@@ -22,7 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es" className={`${fredoka.variable} ${nunito.variable}`}>
       <body>
-        <div className="flex min-h-dvh">
+        <div className="min-h-dvh md:flex">
           <AppSidebar />
           {children}
         </div>

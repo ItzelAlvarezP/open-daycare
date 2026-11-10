@@ -13,8 +13,8 @@ function CameraIcon() {
 
 export default function FeedPage() {
   return (
-    <main className="h-dvh min-w-0 flex-1 overflow-y-auto">
-      <div className="mx-auto w-full max-w-[760px] px-10 pt-[34px] pb-20">
+    <main className="min-w-0 flex-1 md:h-dvh md:overflow-y-auto">
+      <div className="mx-auto w-full max-w-[760px] px-4 pt-[34px] pb-20 md:px-10">
         <header className="mb-6">
           <p className="mb-1 text-[12.5px] font-extrabold tracking-[0.8px] text-clay-dark">
             GUARDERÍA · SALA SOLES
