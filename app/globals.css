@@ -1,26 +1,78 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Design system OpenDayCare — valores del mockup references/pantallas/feed.dc.html */
+@theme {
+  /* superficies */
+  --color-cream: #F6ECDF;     /* fondo de la app */
+  --color-card: #FFFDF9;      /* tarjetas, sidebar, composer */
+  --color-line: #ECE0D0;      /* bordes principales */
+  --color-line-soft: #F0E6D8; /* divisor dentro de las tarjetas */
+  --color-rule: #E7DAC8;      /* divisor "PUBLICADO HOY" */
+  --color-scrollbar: #E4D6C4;
+
+  /* texto */
+  --color-ink: #3F362E;       /* títulos y texto principal */
+  --color-ink-body: #4A4038;  /* cuerpo de los posts */
+  --color-ink-nav: #6E6359;   /* items inactivos del nav */
+  --color-muted: #A89A8B;
+  --color-muted-dark: #94887B;
+
+  /* acentos terracota */
+  --color-clay: #E0654A;      /* corazón, icono cámara */
+  --color-clay-dark: #D9583C; /* eyebrow y nav activa */
+  --color-clay-deep: #C5503A; /* enlace Editar */
+  --color-clay-soft: #FBE3D8; /* nav activa, tile de cámara */
+  --color-cta-from: #F4977E;
+  --color-cta-to: #EE8164;
+  --color-avatar-from: #F8C3A8;
+  --color-avatar-to: #F2937A;
+
+  /* pills por tipo de post */
+  --color-logro: #3E9B6C;
+  --color-logro-soft: #CFEBD8;
+  --color-actividad: #2E89A6;
+  --color-actividad-soft: #C7E7F1;
+  --color-anuncio: #4E72C8;
+  --color-anuncio-soft: #CCD8F4;
+
+  /* placeholder de foto */
+  --color-photo-border: #DBCDBA;
+  --color-photo-bg: #F4ECE1;
+  --color-photo-text: #B0A290;
+
+  /* radios del design system */
+  --radius-item: 12px;
+  --radius-cta: 14px;
+  --radius-photo: 16px;
+  --radius-composer: 18px;
+  --radius-post: 20px;
+
+  /* sombras del mockup */
+  --shadow-cta: 0 8px 18px -8px rgb(238 129 100 / 0.75);
+  --shadow-composer: 0 4px 14px -10px rgb(120 90 60 / 0.4);
+  --shadow-post: 0 4px 16px -12px rgb(120 90 60 / 0.5);
 }
 
+/* las fuentes las define next/font en el layout (paso 2) */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-nunito, system-ui);
+  --font-display: var(--font-fredoka, system-ui);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-nunito, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* scrollbar del mockup */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar);
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
 }
