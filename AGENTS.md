@@ -55,6 +55,7 @@ Daycare communication app: teachers publish posts (activity / achievement / noti
 
 - User-driven: `/spec <description>` writes `specs/NN-slug.md` (`specs/` does not exist yet); `/spec-impl <NN-slug>` implements it step by step on branch `spec-NN-slug`, only if the spec state means Approved/Aprobado, and never commits autonomously.
 - Both skills are vendored in `.agents/skills/` (from GitHub `Klerith/fernando-skills`, pinned by `skills-lock.json`) and are user-invoked only (`disable-model-invocation: true`); `.agents/` and the lockfile are currently untracked in git — don't treat them as stray files.
+- Agent `spec-verifier` (`.opencode/agents/spec-verifier.md`): given a spec (number, slug or full name), it verifies each **Acceptance criteria** item (commands, static code via Read/Grep, visual via Playwright + Context7 for Next.js checks) and marks the spec's checks `[x]`/`[ ]` with evidence. It only edits `specs/**` — fixes go through `/spec-impl`, and it never commits.
 
 ## Playwright
 
