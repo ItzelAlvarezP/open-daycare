@@ -1,31 +1,4 @@
-import type { ReactNode } from "react";
-
-/* SVG genérico con los atributos comunes de los iconos del mockup */
-function Icon({
-  children,
-  size,
-  strokeWidth = 2,
-}: {
-  children: ReactNode;
-  size: number;
-  strokeWidth?: number;
-}) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={strokeWidth}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      {children}
-    </svg>
-  );
-}
+import { Icon } from "./icon";
 
 const NAV_ITEMS = [
   {
