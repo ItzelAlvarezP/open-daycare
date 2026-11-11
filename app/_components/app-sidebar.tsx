@@ -1,12 +1,15 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Icon } from "./icon";
 
 const NAV_ITEMS = [
   {
     label: "Feed",
-    active: true,
+    href: "/",
+    activeOn: ["/"],
     icon: (
       <Icon size={19}>
         <path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />
@@ -15,7 +18,8 @@ const NAV_ITEMS = [
   },
   {
     label: "Niños",
-    active: false,
+    href: "/children",
+    activeOn: ["/children"],
     icon: (
       <Icon size={19}>
         <circle cx="9" cy="7" r="3" />
@@ -26,7 +30,8 @@ const NAV_ITEMS = [
   },
   {
     label: "Avisos",
-    active: false,
+    href: null,
+    activeOn: [],
     icon: (
       <Icon size={19}>
         <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" />
@@ -35,7 +40,8 @@ const NAV_ITEMS = [
   },
   {
     label: "Mi cuenta",
-    active: false,
+    href: null,
+    activeOn: [],
     icon: (
       <Icon size={19}>
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -47,6 +53,7 @@ const NAV_ITEMS = [
 
 export function AppSidebar() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   // cierra con Escape mientras el drawer está abierto
   useEffect(() => {
@@ -124,20 +131,28 @@ export function AppSidebar() {
 
         {/* navegación */}
         <nav className="flex flex-1 flex-col gap-1">
-          {NAV_ITEMS.map(({ label, active, icon }) => (
-            <a
-              key={label}
-              href="#"
-              className={`flex items-center gap-3 rounded-item px-3 py-[11px] text-[14.5px] ${
-                active
-                  ? "bg-clay-soft font-extrabold text-clay-dark"
-                  : "font-semibold text-ink-nav"
-              }`}
-            >
-              {icon}
-              {label}
-            </a>
-          ))}
+          {NAV_ITEMS.map(({ label, href, activeOn, icon }) => {
+            const active = activeOn.some((route) =>
+              route === "/" ? pathname === "/" : pathname.startsWith(route)
+            );
+            const className = `flex items-center gap-3 rounded-item px-3 py-[11px] text-[14.5px] ${
+              active
+                ? "bg-clay-soft font-extrabold text-clay-dark"
+                : "font-semibold text-ink-nav"
+            }`;
+            // los destinos sin pantalla (Avisos, Mi cuenta) siguen sin navegar
+            return href ? (
+              <Link key={label} href={href} className={className}>
+                {icon}
+                {label}
+              </Link>
+            ) : (
+              <a key={label} href="#" className={className}>
+                {icon}
+                {label}
+              </a>
+            );
+          })}
         </nav>
 
         {/* usuaria */}

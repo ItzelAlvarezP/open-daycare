@@ -36,6 +36,27 @@
   --color-anuncio: #4E72C8;
   --color-anuncio-soft: #CCD8F4;
 
+  /* badges de estado en niños y padres (ninos.dc.html / perfil-nino.dc.html) */
+  --color-badge-allergy: #FBD8CC;      /* MANÍ, LACTOSA */
+  --color-badge-allergy-ink: #D9684A;
+  --color-badge-invite: #F9D2DE;       /* VINCULAR */
+  --color-badge-invite-ink: #C56486;
+  --color-badge-pending: #F7E7A6;      /* PENDIENTE */
+  --color-badge-pending-ink: #9A7B1E;
+  /* ACTIVA reutiliza --color-logro-soft / --color-logro */
+
+  /* alerta de alergias del perfil */
+  --color-alert: #FBDAD6;
+  --color-alert-icon: #F4A8A0;
+  --color-alert-title: #C5413A;
+  --color-alert-ink: #B25249;
+
+  /* detalles del listado de niños */
+  --color-chevron: #CBB89F;
+  --color-kid-hover: #F2A78E;
+  --color-placeholder: #B6A99B;
+  --color-dash: #D8CBBA; /* círculo punteado del link "Vincular otro padre" */
+
   /* placeholder de foto */
   --color-photo-border: #DBCDBA;
   --color-photo-bg: #F4ECE1;
@@ -52,6 +73,7 @@
   --shadow-cta: 0 8px 18px -8px rgb(238 129 100 / 0.75);
   --shadow-composer: 0 4px 14px -10px rgb(120 90 60 / 0.4);
   --shadow-post: 0 4px 16px -12px rgb(120 90 60 / 0.5);
+  --shadow-kid: 0 4px 14px -12px rgb(120 90 60 / 0.5);
 }
 
 /* las fuentes las define next/font en el layout (paso 2) */
