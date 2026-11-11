@@ -1,6 +1,6 @@
 # SPEC 03 — Login y activación de cuenta (`/login`, `/activate-account`)
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 02
 > **Fecha:** 2026-11-11
 > **Objetivo:** Reproducir en `/login` y `/activate-account` las pantallas `login.dc.html` y `activar-cuenta.dc.html` sin selector de rol, sin backend ni base de datos, excluyendo el sidebar mediante route groups.
@@ -40,19 +40,32 @@ Este spec no introduce datos nuevos ni mocks. El único estado del mockup (el `l
 
 ## Acceptance criteria
 
-- [ ] `/login` muestra el copy exacto del mockup: claim "El día de cada niño, compartido con su familia.", "Publicá momentos, gestioná las salas y mantené a las familias cerca, desde un solo lugar.", "🌿 Guardería Sala Soles", "Iniciar sesión", "Ingresá para ver el día de hoy.", labels EMAIL y CONTRASEÑA, "¿Olvidaste tu contraseña?" y "¿Te invitó la guardería? Activá tu cuenta".
-- [ ] `/login` no tiene sección "INGRESO COMO" ni botones Personal/Familia (decisión del usuario).
-- [ ] El panel izquierdo usa el gradiente `#F6A98E → #F2937A (45%) → #EC7E62`, dos círculos decorativos `rgba(255,255,255,.12)` y `.10`, y el logo "OpenDayCare" en Fredoka.
-- [ ] El input EMAIL llega precargado con `caro@opendaycare.com`, la contraseña muestra el placeholder `••••••••`, ambos con fondo blanco y borde `#EADFD0`.
-- [ ] El CTA "Iniciar sesión" usa el gradiente `#F4977E → #EE8164` con sombra `0 10px 22px -8px rgba(238,129,100,.7)`.
-- [ ] `/activate-account` replica el mockup: icono con gradiente `#F8C3A8 → #F2937A`, "Bienvenida a OpenDayCare", "Te invitaron a seguir el día de tu hijo. Creá tu contraseña para activar la cuenta.", tarjeta con avatar "M" (`#A9D9E8`/`#1F7A93`) y "Mateo · Sala Soles", código `7K4P9` en Fredoka con letter-spacing 3px, email `lucia.fernandez@gmail.com`, consent box `#FBF1D6` con check `#5FB97E` y su texto exacto, CTA "Activar mi cuenta" y footer "¿Ya tenés cuenta? Iniciar sesión".
-- [ ] El input CREAR CONTRASEÑA usa borde `#F2A78E` como el HTML del mockup (HTML manda), aunque el campo esté vacío.
-- [ ] Todos los `<a>` y botones de las dos pantallas son `href="#"`; ninguno navega.
-- [ ] Ni `/login` ni `/activate-account` muestran el sidebar; `/` y `/children` siguen mostrándolo con su estado activo correcto (Feed / Niños).
-- [ ] Las URLs de SPEC 01 y 02 quedan intactas tras la reorganización: `/`, `/children` y `/children/[childId]`.
-- [ ] A 500px el login se apila (panel compacto arriba, formulario a ancho completo) y `/activate-account` es usable.
-- [ ] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan sin errores.
-- [ ] Capturas `.playwright-mcp/login.png` y `.playwright-mcp/activate-account.png` a ~1200px equivalentes lado a lado a los mockups renderizados.
+- [x] `/login` muestra el copy exacto del mockup: claim "El día de cada niño, compartido con su familia.", "Publicá momentos, gestioná las salas y mantené a las familias cerca, desde un solo lugar.", "🌿 Guardería Sala Soles", "Iniciar sesión", "Ingresá para ver el día de hoy.", labels EMAIL y CONTRASEÑA, "¿Olvidaste tu contraseña?" y "¿Te invitó la guardería? Activá tu cuenta".
+  - Evidencia: `app/(auth)/login/page.tsx:20-25,29,34-35,37-38,47-48,58-59,70-74` contiene el copy literal; captura `.playwright-mcp/login.png`. El 🌿 se ve como tofu solo por falta de fuente emoji en el Chromium headless (el DOM lo incluye).
+- [x] `/login` no tiene sección "INGRESO COMO" ni botones Personal/Familia (decisión del usuario).
+  - Evidencia: grep "INGRESO COMO|Personal|Familia" sin resultados en `app/(auth)/login/page.tsx`; sin `<button>` en la página; captura `.playwright-mcp/login.png`.
+- [x] El panel izquierdo usa el gradiente `#F6A98E → #F2937A (45%) → #EC7E62`, dos círculos decorativos `rgba(255,255,255,.12)` y `.10`, y el logo "OpenDayCare" en Fredoka.
+  - Evidencia: `app/(auth)/login/page.tsx:7` gradiente 155° con `auth-from`/`avatar-to 45%`/`auth-to`; líneas 8-9 círculos `bg-white/12` (420px) y `bg-white/10` (300px); línea 15 logo con `font-display`. Igual que `login.dc.html:26-28,33`.
+- [x] El input EMAIL llega precargado con `caro@opendaycare.com`, la contraseña muestra el placeholder `••••••••`, ambos con fondo blanco y borde `#EADFD0`.
+  - Evidencia: `app/(auth)/login/page.tsx:40-45` (`defaultValue="caro@opendaycare.com"`) y 50-55 (`placeholder="••••••••"`); ambos `border-auth-border bg-white`; `#EADFD0` en `app/globals.css:67`.
+- [x] El CTA "Iniciar sesión" usa el gradiente `#F4977E → #EE8164` con sombra `0 10px 22px -8px rgba(238,129,100,.7)`.
+  - Evidencia: `app/(auth)/login/page.tsx:63-65` usa `cta-from`/`cta-to` (`#F4977E`/`#EE8164`) y `shadow-auth-cta`; `app/globals.css:26-27,75`.
+- [x] `/activate-account` replica el mockup: icono con gradiente `#F8C3A8 → #F2937A`, "Bienvenida a OpenDayCare", "Te invitaron a seguir el día de tu hijo. Creá tu contraseña para activar la cuenta.", tarjeta con avatar "M" (`#A9D9E8`/`#1F7A93`) y "Mateo · Sala Soles", código `7K4P9` en Fredoka con letter-spacing 3px, email `lucia.fernandez@gmail.com`, consent box `#FBF1D6` con check `#5FB97E` y su texto exacto, CTA "Activar mi cuenta" y footer "¿Ya tenés cuenta? Iniciar sesión".
+  - Evidencia: `app/(auth)/activate-account/page.tsx:8-26` (icono `avatar-from/to`, tarjeta `kid-avatar`/`kid-avatar-ink`), 29-47 (`7K4P9` con `font-display tracking-[3px]`, email), 59-85 (consent `consent-bg`/`consent-check`/`consent-ink`, CTA); footer 87-92. Tokens en `app/globals.css:65-76`. Capturas `.playwright-mcp/activate-account.png` vs `activate-account-mockup.png`: idénticas salvo la contraseña (placeholder, ver Decisions).
+- [x] El input CREAR CONTRASEÑA usa borde `#F2A78E` como el HTML del mockup (HTML manda), aunque el campo esté vacío.
+  - Evidencia: `app/(auth)/activate-account/page.tsx:56` `border-kid-hover`; `#F2A78E` en `app/globals.css:56`; visible con campo vacío en la captura.
+- [x] Todos los `<a>` y botones de las dos pantallas son `href="#"`; ninguno navega.
+  - Evidencia: DOM evaluado con Playwright — login: 3 `<a>` (`Olvidaste`, `Iniciar sesión`, `Activá tu cuenta`), activate: 2 (`Activar mi cuenta`, `Iniciar sesión`), todos `href="#"`; cero `<button>`; click en el CTA mantiene `location.pathname === "/activate-account"`.
+- [x] Ni `/login` ni `/activate-account` muestran el sidebar; `/` y `/children` siguen mostrándolo con su estado activo correcto (Feed / Niños).
+  - Evidencia: `app/layout.tsx` solo fuentes+metadata+body; sidebar solo en `app/(app)/layout.tsx:3-9`; capturas `.playwright-mcp/feed-sidebar.png` (Feed activo), `children-sidebar.png` y `children-detail.png` (Niños activo); `/login` y `/activate-account` sin sidebar.
+- [x] Las URLs de SPEC 01 y 02 quedan intactas tras la reorganización: `/`, `/children` y `/children/[childId]`.
+  - Evidencia: `npm run build` lista `/`, `/children`, `/children/[childId]` (+`/login`, `/activate-account`); navegación runtime a las tres URLs OK (capturas anteriores).
+- [x] A 500px el login se apila (panel compacto arriba, formulario a ancho completo) y `/activate-account` es usable.
+  - Evidencia: capturas `.playwright-mcp/login-mobile.png` (grid 1 columna, panel compacto, form ancho completo) y `activate-account-mobile.png` (todo visible y usable).
+- [x] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan sin errores.
+  - Evidencia: los tres comandos ejecutados el 2026-11-11 — lint y tsc sin output, build ✓ (Next.js 16.4.6, 16 páginas estáticas).
+- [x] Capturas `.playwright-mcp/login.png` y `.playwright-mcp/activate-account.png` a ~1200px equivalentes lado a lado a los mockups renderizados.
+  - Evidencia: app y mockups capturados a 1200px (`.playwright-mcp/login.png` vs `login-mockup.png`; `activate-account.png` vs `activate-account-mockup.png`) y comparados visualmente — coinciden.
 
 ## Decisions
 
