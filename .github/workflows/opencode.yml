@@ -1,0 +1,118 @@
+name: OpenCode comment assistant
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+concurrency:
+  group: opencode-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  authorize:
+    if: >-
+      github.event.issue.pull_request == null ||
+      github.event.comment.body != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+    outputs:
+      authorized: ${{ steps.check.outputs.authorized }}
+      instruction: ${{ steps.check.outputs.instruction }}
+      is_pr: ${{ steps.check.outputs.is_pr }}
+    steps:
+      - name: Check commenter permission and command
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          COMMENTER: ${{ github.event.comment.user.login }}
+          REPOSITORY: ${{ github.repository }}
+          IS_PR: ${{ github.event.issue.pull_request != null }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          permission=$(gh api "repos/${REPOSITORY}/collaborators/${COMMENTER}/permission" --jq '.permission')
+          if [[ "$permission" != "admin" && "$permission" != "write" && "$permission" != "maintain" ]]; then
+            echo "authorized=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "$COMMENT_BODY" != /oc\ * ]]; then
+            echo "authorized=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          instruction=${COMMENT_BODY#/oc }
+          if [[ -z "${instruction//[[:space:]]/}" ]]; then
+            echo "authorized=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "authorized=true" >> "$GITHUB_OUTPUT"
+          echo "is_pr=$IS_PR" >> "$GITHUB_OUTPUT"
+          {
+            echo 'instruction<<OPENCODE_INSTRUCTION_EOF'
+            echo "$instruction"
+            echo 'OPENCODE_INSTRUCTION_EOF'
+          } >> "$GITHUB_OUTPUT"
+
+  run-opencode:
+    needs: authorize
+    if: needs.authorize.outputs.authorized == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install OpenCode 2
+        run: curl -fsSL https://opencode.ai/v2/install | bash
+
+      - name: Load issue or pull request context
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          gh issue view "$ISSUE_NUMBER" --repo "$REPOSITORY" --json title,body,comments,labels,assignees > "$RUNNER_TEMP/context.json"
+
+      - name: Run OpenCode
+        id: opencode
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GH_TOKEN: ${{ secrets.OPENCODE_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          INSTRUCTION: ${{ needs.authorize.outputs.instruction }}
+          IS_PR: ${{ needs.authorize.outputs.is_pr }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s\n' "$INSTRUCTION" > "$RUNNER_TEMP/instruction.txt"
+          context=$(cat "$RUNNER_TEMP/context.json")
+          prompt_file="$RUNNER_TEMP/prompt.txt"
+          {
+            echo 'Eres un asistente de desarrollo en GitHub. Lee el contexto del issue/PR y las instrucciones adjuntas.'
+            echo 'Si se piden cambios de código, impleméntalos en una rama nueva y crea un pull request. No muestres secretos.'
+            echo 'Al terminar, escribe una respuesta breve y útil que se publicará en el issue o conversación del PR.'
+            echo 'CONTEXTO JSON:'
+            echo "$context"
+            echo 'INSTRUCCIÓN DEL USUARIO:'
+            cat "$RUNNER_TEMP/instruction.txt"
+          } > "$prompt_file"
+
+          opencode run --model openai/gpt-4.1-nano "$(cat "$prompt_file")" > "$RUNNER_TEMP/response.txt"
+          gh issue comment "$ISSUE_NUMBER" --repo "$GH_REPO" --body-file "$RUNNER_TEMP/response.txt"
