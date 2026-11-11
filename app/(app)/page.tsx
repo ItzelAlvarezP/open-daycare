@@ -1,5 +1,5 @@
-import { Icon } from "./_components/icon";
-import { PostCard } from "./_components/post-card";
+import { Icon } from "../_components/icon";
+import { PostCard } from "../_components/post-card";
 import { MOCK_POSTS, MOCK_SESSION } from "@/lib/mock-posts";
 
 function CameraIcon() {

@@ -1,6 +1,6 @@
 # SPEC 02 — Listado de niños y perfil (`/children`)
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-11-11
 > **Objetivo:** Reproducir en `/children` y `/children/[childId]` las pantallas `ninos.dc.html` y `perfil-nino.dc.html` con datos mock y navegación real entre ambas, sin base de datos y con rutas en inglés.

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { MockParent } from "@/lib/mock-children";
 import { MOCK_CHILDREN } from "@/lib/mock-children";
-import { Icon } from "../../_components/icon";
+import { Icon } from "../../../_components/icon";
 
 export function generateStaticParams() {
   return MOCK_CHILDREN.map((child) => ({ childId: child.id }));
