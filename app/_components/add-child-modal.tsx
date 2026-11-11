@@ -109,7 +109,7 @@ export function AddChildButton() {
       {open && (
         <div
           onClick={close}
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-backdrop p-10 max-sm:p-6"
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-backdrop px-6 py-10 max-sm:p-6"
         >
           <div
             onClick={(event) => event.stopPropagation()}
