@@ -1,6 +1,6 @@
 # SPEC 04 — Modal Agregar niño (`/children`)
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02, SPEC 03
 > **Fecha:** 2026-11-11
 > **Objetivo:** Reproducir `agregar-nino.dc.html` como un modal sobre `/children` que se abre desde el CTA "Agregar niño" y valida como requeridos sus tres primeros campos al pulsar Guardar.
@@ -56,22 +56,22 @@ El form se desmonta al cerrar (render condicional), así los inputs uncontrolled
 
 ## Acceptance criteria
 
-- [ ] El CTA "Agregar niño" de `/children` abre el modal sobre la página (backdrop + tarjeta centrada) sin cambiar de URL.
-- [ ] La tarjeta replica el mockup: fondo `#FBF4EC`, borde `#ECE0D0`, radio 24px, sombra del mockup, header con "Cancelar" `#94887B` / "Agregar niño" en Fredoka / "Guardar" `#D9583C`.
-- [ ] Los cinco campos muestran el copy exacto: labels "NOMBRE COMPLETO", "FECHA DE NACIMIENTO", "SALA", "ALERGIAS (ETIQUETAS)", "NOTAS MÉDICAS" y placeholders "Ej. Martina López", "dd/mm/aaaa", "Ej. Maní, Lactosa", "Indicaciones, medicación, contactos…".
-- [ ] FECHA DE NACIMIENTO y SALA comparten fila (2 columnas) como en el mockup.
-- [ ] SALA es un `<select>` con la única opción "Soles" preseleccionada y chevron decorativo.
-- [ ] Guardar con los 3 requeridos vacíos muestra errores inline (texto terracota + borde de error) bajo nombre, fecha y sala, y el modal permanece abierto.
-- [ ] Guardar con una fecha en formato inválido o imposible (p. ej. "abc", "31/02/2024") muestra su error inline; con "dd/mm/aaaa" válida no lo muestra.
-- [ ] Escribir en un campo con error limpia ese error al momento.
-- [ ] Guardar con los 3 requeridos válidos cierra el modal; la lista no cambia y el divisor sigue "8 niños".
-- [ ] ALERGIAS y NOTAS MÉDICAS vacías no bloquean Guardar.
-- [ ] Cancelar, clic en backdrop y Esc cierran el modal sin confirmación; al reabrir, el formulario vuelve vacío.
-- [ ] Al abrir el modal no se puede hacer scroll de la página de fondo.
-- [ ] `/children` no cambia en lo demás: buscador decorativo, divisor, 8 tarjetas y los demás CTAs siguen `href="#"`.
-- [ ] Bajo 640px el modal es completo y usable (ancho con márgenes, sin cortes).
-- [ ] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan sin errores.
-- [ ] Capturas `.playwright-mcp/agregar-nino.png` (desktop, estado válido y error) y móvil equivalentes lado a lado al mockup renderizado.
+- [x] El CTA "Agregar niño" de `/children` abre el modal sobre la página (backdrop + tarjeta centrada) sin cambiar de URL. — ✅ Playwright: abrió el modal y `location.pathname` permaneció en `/children`; `.playwright-mcp/agregar-nino.png`.
+- [x] La tarjeta replica el mockup: fondo `#FBF4EC`, borde `#ECE0D0`, radio 24px, sombra del mockup, header con "Cancelar" `#94887B` / "Agregar niño" en Fredoka / "Guardar" `#D9583C`. — ✅ Estilos computados en vivo: fondo `rgb(251,244,236)`, borde `rgb(236,224,208)`, radio `24px`, sombra `0 20px 50px -24px`, ancho `520px`; header: Cancelar `rgb(148,136,123)`/700, Fredoka 600/18px, Guardar `rgb(217,88,60)`/800. Captura `.playwright-mcp/agregar-nino.png` comparada visualmente con `.playwright-mcp/agregar-nino-mockup.png`.
+- [x] Los cinco campos muestran el copy exacto: labels "NOMBRE COMPLETO", "FECHA DE NACIMIENTO", "SALA", "ALERGIAS (ETIQUETAS)", "NOTAS MÉDICAS" y placeholders "Ej. Martina López", "dd/mm/aaaa", "Ej. Maní, Lactosa", "Indicaciones, medicación, contactos…". — ✅ Labels y placeholders evaluados en el DOM; captura `.playwright-mcp/agregar-nino.png`.
+- [x] FECHA DE NACIMIENTO y SALA comparten fila (2 columnas) como en el mockup. — ✅ Captura `.playwright-mcp/agregar-nino.png` comparada con el mockup.
+- [x] SALA es un `<select>` con la única opción "Soles" preseleccionada y chevron decorativo. — ✅ DOM: `select.value === "Soles"`, única opción `Soles`; chevron SVG decorativo en el campo.
+- [x] Guardar con los requeridos vacíos muestra errores inline (texto terracota + borde de error) bajo nombre y fecha, y el modal permanece abierto; SALA llega preseleccionada en "Soles" y por diseño no puede quedar vacía, así que nunca marca error. — ✅ Playwright: modal permanece abierto; dos mensajes `Completá este campo.` en `rgb(217,88,60)`, bordes `rgb(224,101,74)`; SALA conserva `Soles` y borde normal. Captura `.playwright-mcp/agregar-nino-errores.png`.
+- [x] Guardar con una fecha en formato inválido o imposible (p. ej. "abc", "31/02/2024") muestra su error inline; con "dd/mm/aaaa" válida no lo muestra. — ✅ Playwright: `31/02/2024` muestra `Usá el formato dd/mm/aaaa.`; `12/03/2022` no muestra error y restaura el borde normal.
+- [x] Escribir en un campo con error limpia ese error al momento. — ✅ Playwright: al escribir nombre válido, desapareció su mensaje y el borde volvió a `rgb(234,223,208)`; lo mismo al corregir la fecha.
+- [x] Guardar con los 3 requeridos válidos cierra el modal; la lista no cambia y el divisor sigue "8 niños". — ✅ Playwright: modal cerrado, URL `/children`, divisor `8 niños` y 8 tarjetas tras guardar nombre/fecha con sala preseleccionada.
+- [x] ALERGIAS y NOTAS MÉDICAS vacías no bloquean Guardar. — ✅ Playwright: Guardar con ambos opcionales vacíos cerró el modal.
+- [x] Cancelar, clic en backdrop y Esc cierran el modal sin confirmación; al reabrir, el formulario vuelve vacío. — ✅ Playwright verificó los tres cierres; al reabrir, nombre, fecha, alergias y notas vacíos, sala `Soles` y cero errores.
+- [x] Al abrir el modal no se puede hacer scroll de la página de fondo. — ✅ `document.body.style.overflow === "hidden"` abierto y restaurado a `""` al cerrar.
+- [x] `/children` no cambia en lo demás: buscador decorativo, divisor, 8 tarjetas y los demás CTAs siguen `href="#"`. — ✅ DOM en vivo: buscador sin handlers, divisor `8 niños`, 8 enlaces de tarjetas; los otros destinos siguen sin navegación.
+- [x] Bajo 640px el modal es completo y usable (ancho con márgenes, sin cortes). — ✅ Playwright a 500×800: tarjeta 452px de ancho (24px por lado), sin corte y backdrop con `overflow-y: auto`; captura `.playwright-mcp/agregar-nino-mobile.png`.
+- [x] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan sin errores. — ✅ Los tres comandos pasaron; build de Next.js 16.4.6 prerenderizó 16/16 páginas y `/children` quedó estática.
+- [x] Capturas `.playwright-mcp/agregar-nino.png` (desktop, estado válido y error) y móvil equivalentes lado a lado al mockup renderizado. — ✅ Capturas `.playwright-mcp/agregar-nino.png`, `agregar-nino-completo.png`, `agregar-nino-errores.png`, `agregar-nino-mobile.png` y `agregar-nino-mockup.png`; comparación visual confirma layout, copy y estilos equivalentes.
 
 ## Decisions
 
@@ -79,7 +79,7 @@ El form se desmonta al cerrar (render condicional), así los inputs uncontrolled
 - **No:** agregar el niño al grid ni generarle perfil. Los perfiles se prerenderizan desde el mock (`generateStaticParams`), así que un niño nuevo no tendría a dónde navegar; si en el futuro aterriza, su tarjeta será **sin link** (decisión del usuario para ese escenario).
 - **Sí:** errores inline estilo app (texto `clay-dark` + borde `clay`). Decisión del usuario; la validación nativa rompe la fidelidad visual.
 - **Sí:** fecha como input de texto `dd/mm/aaaa` con validación de formato y de fecha real. Decisión del usuario; `type="date"` pierde el placeholder y la UI del mockup.
-- **Sí:** `<select>` real con la única opción "Soles" preseleccionada. Decisión del usuario; deja el camino abierto a más salas.
+- **Sí:** `<select>` real con la única opción "Soles" preseleccionada. Decisión del usuario; deja el camino abierto a más salas. Resolución de la contradicción detectada en implementación: al estar preseleccionada, la sala nunca queda vacía y su validación nunca dispara error (el criterio de aceptación se reescribió en consecuencia).
 - **Sí:** Cancelar/backdrop/Esc cierran sin confirmación, con scroll de fondo bloqueado y form que vuelve vacío. Estándar de modales; el desmontaje condicional resetea gratis.
 - **Sí:** `AddChildButton` como client component en `app/_components/` (convención del repo); el CTA deja de ser `<a href="#">` y pasa a `<button>`, igual que "Cancelar" y "Guardar" (son acciones, no navegación).
 - **Sí:** modal renderizado condicionalmente sin portal: `fixed` cubre el viewport aunque el componente viva dentro del header (sin transforms en ancestros).
