@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { MockParent } from "@/lib/mock-children";
 import { MOCK_CHILDREN } from "@/lib/mock-children";
 import { Icon } from "../../../_components/icon";
+import { LinkParentModal } from "../../../_components/link-parent-modal";
 
 export function generateStaticParams() {
   return MOCK_CHILDREN.map((child) => ({ childId: child.id }));
@@ -140,16 +141,7 @@ export default async function ChildProfilePage({
                 {child.parents.map((parent) => (
                   <ParentRow key={parent.fullName} parent={parent} />
                 ))}
-                <a href="#" className="flex items-center gap-3 pt-2">
-                  <span className="flex size-10 flex-none items-center justify-center rounded-full border-[1.5px] border-dashed border-dash text-photo-text">
-                    <Icon size={18} strokeWidth={2.2}>
-                      <path d="M12 5v14M5 12h14" />
-                    </Icon>
-                  </span>
-                  <span className="text-[14.5px] font-extrabold text-clay-deep">
-                    Vincular otro padre
-                  </span>
-                </a>
+                <LinkParentModal childName={child.fullName} />
               </div>
             </div>
           </div>
