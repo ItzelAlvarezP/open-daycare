@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { MockChild } from "@/lib/mock-children";
 import { MOCK_CHILDREN } from "@/lib/mock-children";
+import { AddChildButton } from "../../_components/add-child-modal";
 import { Icon } from "../../_components/icon";
 
 function ChildCard({ child }: { child: MockChild }) {
@@ -59,15 +60,7 @@ export default function ChildrenPage() {
               Niños
             </h1>
           </div>
-          <a
-            href="#"
-            className="flex flex-none items-center gap-2 rounded-cta bg-linear-to-b from-cta-from to-cta-to px-[18px] py-[11px] text-[14.5px] font-extrabold text-white shadow-cta"
-          >
-            <Icon size={17} strokeWidth={2.4}>
-              <path d="M12 5v14M5 12h14" />
-            </Icon>
-            Agregar niño
-          </a>
+          <AddChildButton />
         </div>
 
         {/* buscador decorativo, sin lógica de filtrado */}
