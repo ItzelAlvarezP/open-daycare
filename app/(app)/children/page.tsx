@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { MockChild } from "@/lib/mock-children";
 import { MOCK_CHILDREN } from "@/lib/mock-children";
-import { Icon } from "../_components/icon";
+import { Icon } from "../../_components/icon";
 
 function ChildCard({ child }: { child: MockChild }) {
   return (
