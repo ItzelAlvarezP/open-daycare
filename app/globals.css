@@ -54,6 +54,7 @@
   /* detalles del listado de niños */
   --color-chevron: #CBB89F;
   --color-kid-hover: #F2A78E;
+  --color-placeholder: #B6A99B;
 
   /* placeholder de foto */
   --color-photo-border: #DBCDBA;
@@ -71,6 +72,7 @@
   --shadow-cta: 0 8px 18px -8px rgb(238 129 100 / 0.75);
   --shadow-composer: 0 4px 14px -10px rgb(120 90 60 / 0.4);
   --shadow-post: 0 4px 16px -12px rgb(120 90 60 / 0.5);
+  --shadow-kid: 0 4px 14px -12px rgb(120 90 60 / 0.5);
 }
 
 /* las fuentes las define next/font en el layout (paso 2) */
