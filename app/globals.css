@@ -75,18 +75,23 @@
   --shadow-auth-cta: 0 10px 22px -8px rgb(238 129 100 / 0.7);
   --shadow-auth-icon: 0 12px 26px -10px rgb(238 129 100 / 0.65);
 
+  /* modal Agregar niño (agregar-nino.dc.html) */
+  --color-backdrop: rgb(63 54 46 / 0.4); /* velo sobre /children al abrir el modal */
+
   /* radios del design system */
   --radius-item: 12px;
   --radius-cta: 14px;
   --radius-photo: 16px;
   --radius-composer: 18px;
   --radius-post: 20px;
+  --radius-modal: 24px; /* tarjeta del modal Agregar niño */
 
   /* sombras del mockup */
   --shadow-cta: 0 8px 18px -8px rgb(238 129 100 / 0.75);
   --shadow-composer: 0 4px 14px -10px rgb(120 90 60 / 0.4);
   --shadow-post: 0 4px 16px -12px rgb(120 90 60 / 0.5);
   --shadow-kid: 0 4px 14px -12px rgb(120 90 60 / 0.5);
+  --shadow-modal: 0 20px 50px -24px rgb(63 54 46 / 0.35); /* tarjeta del modal */
 }
 
 /* las fuentes las define next/font en el layout (paso 2) */
