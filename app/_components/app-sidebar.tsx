@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Icon } from "./icon";
+import { NewPostButton } from "./new-post-modal";
 
 const NAV_ITEMS = [
   {
@@ -119,15 +120,7 @@ export function AppSidebar() {
         </a>
 
         {/* CTA nueva publicación */}
-        <a
-          href="#"
-          className="mb-[18px] flex items-center justify-center gap-2 rounded-cta bg-linear-to-b from-cta-from to-cta-to px-3 py-3 text-[14.5px] font-extrabold text-white shadow-cta"
-        >
-          <Icon size={17} strokeWidth={2.4}>
-            <path d="M12 5v14M5 12h14" />
-          </Icon>
-          Nueva publicación
-        </a>
+        <NewPostButton />
 
         {/* navegación */}
         <nav className="flex flex-1 flex-col gap-1">
