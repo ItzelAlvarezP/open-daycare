@@ -31,13 +31,20 @@ Before the final response, run one reporting pass. If candidates remain, from th
 
 # OpenDayCare
 
-Daycare communication app: teachers publish posts (activity / achievement / notice types), day summaries and child profiles to families; mockups cover both staff and family (`familia-*`) views. Stack: Next.js 16 App Router + React 19 + Tailwind CSS 4, npm (package-lock.json). `app/` is still the create-next-app starter — the product is defined by the reference mockups below. UI copy: Spanish. Code identifiers: English; comments: Spanish.
+Daycare communication app: teachers publish posts (activity / achievement / notice types), day summaries and child profiles to families; mockups cover both staff and family (`familia-*`) views. Stack: Next.js 16 App Router + React 19 + Tailwind CSS 4, backend Supabase, npm (package-lock.json). `app/` is still the create-next-app starter — the product is defined by the reference mockups below. UI copy: Spanish. Code identifiers: English; comments: Spanish.
 
 ## Commands
 
 - `npm run dev` — http://localhost:3000
 - `npm run lint` — ESLint 9 flat config. Typecheck: `npx tsc --noEmit`. No tests exist.
 - `npm run build` / `npm run start`
+
+## Supabase
+
+- Backend del proyecto. El MCP server de Supabase (remote, `https://mcp.supabase.com/mcp`) está configurado globalmente en `~/.config/opencode/opencode.json` y apunta al project ref `rqvennwvmfjsuvjqwnim`.
+- Skills `supabase` y `supabase-postgres-best-practices` vendidas en `.agents/skills/`: cárgalas (skill tool) antes de cualquier tarea que toque Supabase o Postgres (schema, RLS, migraciones, auth, queries, debugging).
+- El esquema de BD de referencia vive en `../07-DB-Schema` (referencia `docs` en `opencode.json`): es solo referencia, aún no está implementado en la base de datos.
+- Credenciales: `.env` (gitignored) contiene `SUPABASE_DB_PASSWORD`; `.env.example` es el template trackeado. Nunca commitear claves.
 
 ## Next.js 16 specifics
 
@@ -54,7 +61,9 @@ Daycare communication app: teachers publish posts (activity / achievement / noti
 ## Spec workflow
 
 - User-driven: `/spec <description>` writes `specs/NN-slug.md` (`specs/` does not exist yet); `/spec-impl <NN-slug>` implements it step by step on branch `spec-NN-slug`, only if the spec state means Approved/Aprobado, and never commits autonomously.
-- Both skills are vendored in `.agents/skills/` (from GitHub `Klerith/fernando-skills`, pinned by `skills-lock.json`) and are user-invoked only (`disable-model-invocation: true`); `.agents/` and the lockfile are currently untracked in git — don't treat them as stray files.
+- Skills vendidas en `.agents/skills/` (pinned by `skills-lock.json`):
+  - `spec` / `spec-impl` (from GitHub `Klerith/fernando-skills`) are user-invoked only (`disable-model-invocation: true`).
+  - `supabase` / `supabase-postgres-best-practices` (from GitHub `supabase/agent-skills`) are model-invocable: load them for any Supabase/Postgres task (see below).
 - Agent `spec-verifier` (`.opencode/agents/spec-verifier.md`): given a spec (number, slug or full name), it verifies each **Acceptance criteria** item (commands, static code via Read/Grep, visual via Playwright + Context7 for Next.js checks) and marks the spec's checks `[x]`/`[ ]` with evidence. It only edits `specs/**` — fixes go through `/spec-impl`, and it never commits.
 
 ## Playwright
