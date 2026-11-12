@@ -35,6 +35,8 @@
   --color-actividad-soft: #C7E7F1;
   --color-anuncio: #4E72C8;
   --color-anuncio-soft: #CCD8F4;
+  --color-siesta: #7B5FC0;      /* chip Siesta del modal Nueva publicación */
+  --color-siesta-soft: #E7DCF6;
 
   /* badges de estado en niños y padres (ninos.dc.html / perfil-nino.dc.html) */
   --color-badge-allergy: #FBD8CC;      /* MANÍ, LACTOSA */
