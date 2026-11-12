@@ -114,5 +114,5 @@ jobs:
             cat "$RUNNER_TEMP/instruction.txt"
           } > "$prompt_file"
 
-          opencode run --model openai/gpt-4.1-nano "$(cat "$prompt_file")" > "$RUNNER_TEMP/response.txt"
+          opencode run --model opencode/big-pickle "$(cat "$prompt_file")" > "$RUNNER_TEMP/response.txt"
           gh issue comment "$ISSUE_NUMBER" --repo "$GH_REPO" --body-file "$RUNNER_TEMP/response.txt"
