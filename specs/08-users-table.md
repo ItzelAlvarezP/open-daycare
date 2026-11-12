@@ -180,19 +180,32 @@ Convenciones del doc: PK uuid default `gen_random_uuid()` (aquí la aporta `auth
 
 ## Acceptance criteria
 
-- [ ] `list_migrations` muestra la migración `create_users_table` aplicada.
-- [ ] El SQL completo vive versionado en `supabase/migrations/<versión>_create_users_table.sql` y coincide con lo aplicado.
-- [ ] `unnest(enum_range(null::public.user_role))` devuelve exactamente `staff`, `parent`, `admin`; y `user_status` exactamente `pending`, `active`.
-- [ ] `information_schema.columns` confirma `public.users` con exactamente las columnas `id`, `daycare_id`, `role`, `status`, `full_name`, `avatar_url`, `notify_on_post`, `daily_summary_enabled`, `created_at`, `updated_at` con sus tipos/nullable/default según el data model.
-- [ ] `pg_constraint` confirma FK `id` → `auth.users` con `ON DELETE CASCADE` (`confdeltype = 'c'`) y FK `daycare_id` → `daycares`; `pg_indexes` contiene `users_daycare_id_idx`.
-- [ ] `pg_trigger` contiene `on_auth_user_created` sobre `auth.users` y `users_updated_at` sobre `public.users` (moddatetime).
-- [ ] Alta del staff vía SQL → el trigger crea la fila en `public.users` con `role = 'staff'`, `status = 'active'`, `full_name = 'Docente Soles'` y el `daycare_id` de «Guardería Sala Soles» (verificado con join a `daycares`).
-- [ ] Alta de un usuario Auth sin `role` en `raw_app_meta_data` → perfil creado con `role = 'parent'` (fallback); su delete en `auth.users` borra el perfil por cascade.
-- [ ] Insert en `auth.users` sin `daycare_id` en metadata falla con la exception `Signup requires daycare_id in metadata` (probado dentro de una transacción con `rollback`).
-- [ ] Con `set local role anon`, `select count(*) from public.users` devuelve 0 (RLS bloquea al anónimo).
-- [ ] Con `set local role authenticated` + `request.jwt.claims` del staff, `select` sobre `public.users` devuelve su fila y las de su guardería, y ninguna de otra guardería.
-- [ ] Con la sesión simulada del staff, `update public.users set role = 'admin' where id = <staff>` falla con error de RLS (`42501`, violación de `WITH CHECK`), y un `update ... set full_name` propio sí funciona moviendo `updated_at` (trigger moddatetime).
-- [ ] `set local role anon` / `authenticated` no puede usar el schema `private` (`permission denied`) y `get_advisors` (security) no reporta issues críticos nuevos derivados de esta migración.
+- [x] `list_migrations` muestra la migración `create_users_table` aplicada.
+  > ✅ MCP `list_migrations` → versión `20261112205420`, name `create_users_table` (última de las 4 registradas).
+- [x] El SQL completo vive versionado en `supabase/migrations/<versión>_create_users_table.sql` y coincide con lo aplicado.
+  > ✅ `supabase/migrations/20261112205420_create_users_table.sql` (106 líneas); MD5 del fichero = `065745d432539289b04a3e063868cb72` = `md5(btrim(statements[1], chr(10)))` en `supabase_migrations.schema_migrations`. El array del historial solo añade `\n` delimitadores inicial/final.
+- [x] `unnest(enum_range(null::public.user_role))` devuelve exactamente `staff`, `parent`, `admin`; y `user_status` exactamente `pending`, `active`.
+  > ✅ `execute_sql` → `enum_user_role: staff,parent,admin`; `enum_user_status: pending,active`.
+- [x] `information_schema.columns` confirma `public.users` con exactamente las columnas `id`, `daycare_id`, `role`, `status`, `full_name`, `avatar_url`, `notify_on_post`, `daily_summary_enabled`, `created_at`, `updated_at` con sus tipos/nullable/default según el data model.
+  > ✅ 10 columnas exactas: `id`/`daycare_id` uuid NOT NULL, `role` user_role NOT NULL default `'parent'`, `status` user_status NOT NULL default `'active'`, `full_name` text NOT NULL, `avatar_url` text nullable, `notify_on_post`/`daily_summary_enabled` bool NOT NULL default `true`, `created_at`/`updated_at` timestamptz NOT NULL default `now()`.
+- [x] `pg_constraint` confirma FK `id` → `auth.users` con `ON DELETE CASCADE` (`confdeltype = 'c'`) y FK `daycare_id` → `daycares`; `pg_indexes` contiene `users_daycare_id_idx`.
+  > ✅ `users_id_fkey` (`confdeltype=c`), `users_daycare_id_fkey`; índices `users_daycare_id_idx` + `users_pkey`.
+- [x] `pg_trigger` contiene `on_auth_user_created` sobre `auth.users` y `users_updated_at` sobre `public.users` (moddatetime).
+  > ✅ `on_auth_user_created` en `auth.users`; `users_updated_at` en `public.users` ejecuta `public.moddatetime`.
+- [x] Alta del staff vía SQL → el trigger crea la fila en `public.users` con `role = 'staff'`, `status = 'active'`, `full_name = 'Docente Soles'` y el `daycare_id` de «Guardería Sala Soles» (verificado con join a `daycares`).
+  > ✅ Fila de `staff.soles@opendaycare.test`: `role=staff`, `status=active`, `full_name='Docente Soles'`, join a `daycares` → `Guardería Sala Soles`.
+- [x] Alta de un usuario Auth sin `role` en `raw_app_meta_data` → perfil creado con `role = 'parent'` (fallback); su delete en `auth.users` borra el perfil por cascade.
+  > ✅ Test transaccional con `rollback`: app_metadata sin `role` → perfil `parent`/`active`/`Parent Fallback Test` (Guardería Estrellitas); `delete from auth.users` → 0 perfiles tras cascade.
+- [x] Insert en `auth.users` sin `daycare_id` en metadata falla con la exception `Signup requires daycare_id in metadata` (probado dentro de una transacción con `rollback`).
+  > ✅ Error `P0001: Signup requires daycare_id in metadata` (contexto `private.handle_new_user() line 15`); sin filas residuales de `auth.users` ni `public.users` tras el fallo.
+- [x] Con `set local role anon`, `select count(*) from public.users` devuelve 0 (RLS bloquea al anónimo).
+  > ✅ `begin; set local role anon; select count(*)` → `0`; `rollback`.
+- [x] Con `set local role authenticated` + `request.jwt.claims` del staff, `select` sobre `public.users` devuelve su fila y las de su guardería, y ninguna de otra guardería.
+  > ✅ Sesión simulada del staff → solo su fila (Guardería Sala Soles); el padre de Guardería Estrellitas (otra guardería) no aparece.
+- [x] Con la sesión simulada del staff, `update public.users set role = 'admin' where id = <staff>` falla con error de RLS (`42501`, violación de `WITH CHECK`), y un `update ... set full_name` propio sí funciona moviendo `updated_at` (trigger moddatetime).
+  > ✅ `update set role='admin'` → `42501: new row violates row-level security policy for table "users"` (WITH CHECK); `update set full_name` OK con `updated_at > created_at` (moddatetime); el `rollback` restauró el valor.
+- [x] `set local role anon` / `authenticated` no puede usar el schema `private` (`permission denied`) y `get_advisors` (security) no reporta issues críticos nuevos derivados de esta migración.
+  > ✅ `anon` y `authenticated` → `42501: permission denied for schema private`. `get_advisors` (security): 4 WARN, 0 críticos. Único derivado de esta migración: `extension_in_public` (WARN, `moddatetime` en `public`; mover a schema `extensions` en una futura migración). Los otros 3 (`rls_auto_enable` ×2, leaked password protection) son previos.
 
 ## Decisions
 
