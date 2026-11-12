@@ -18,6 +18,9 @@ const POST_TYPES: { id: PostType; label: string; soft: string; solid: string }[]
   { id: "anuncio", label: "Anuncio", soft: "bg-anuncio-soft text-anuncio", solid: "bg-anuncio text-white" },
 ];
 
+const REQUIRED_MESSAGE = "Completá este campo.";
+const initialSelection = () => new Set(["mateo-fernandez"]);
+
 function SectionLabel({ children }: { children: string }) {
   return (
     <p className="mb-[10px] text-[12px] font-extrabold tracking-[0.7px] text-muted-dark">
@@ -33,15 +36,30 @@ function chipClasses(selected: boolean) {
   }`;
 }
 
+function textareaClasses(hasError: boolean) {
+  return `w-full rounded-cta border-[1.5px] bg-white px-4 py-[14px] text-[15px] text-ink outline-none placeholder:text-placeholder ${
+    hasError ? "border-clay" : "border-auth-border"
+  }`;
+}
+
 /* CTA "Nueva publicación" del sidebar + modal de crear-publicacion.dc.html */
 export function NewPostButton() {
   const [open, setOpen] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(["mateo-fernandez"]));
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(initialSelection);
   const [type, setType] = useState<PostType>("actividad");
+  const [description, setDescription] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const allSelected = selectedIds.size === MOCK_CHILDREN.length;
 
-  const close = () => setOpen(false);
+  /* cualquier cierre reinicia el form: al reabrir todo vuelve al estado inicial */
+  const close = () => {
+    setOpen(false);
+    setSelectedIds(initialSelection());
+    setType("actividad");
+    setDescription("");
+    setError(null);
+  };
 
   const toggleChild = (id: string) => {
     setSelectedIds((prev) => {
@@ -54,6 +72,15 @@ export function NewPostButton() {
 
   const toggleAll = () => {
     setSelectedIds(allSelected ? new Set<string>() : new Set(MOCK_CHILDREN.map((c) => c.id)));
+  };
+
+  /* únicamente diseño: valida la descripción y cierra, sin guardar nada */
+  const publish = () => {
+    if (!description.trim()) {
+      setError(REQUIRED_MESSAGE);
+      return;
+    }
+    close();
   };
 
   /* con el modal abierto: scroll de fondo bloqueado y Esc cierra */
@@ -106,8 +133,11 @@ export function NewPostButton() {
                 <span className="font-display text-[18px] font-semibold text-ink">
                   Nueva publicación
                 </span>
-                {/* Publicar valida y cierra en el paso 4 */}
-                <button type="button" className="cursor-pointer text-[15px] font-extrabold text-clay-dark">
+                <button
+                  type="button"
+                  onClick={publish}
+                  className="cursor-pointer text-[15px] font-extrabold text-clay-dark"
+                >
                   Publicar
                 </button>
               </div>
@@ -148,7 +178,7 @@ export function NewPostButton() {
                   </div>
                 </div>
 
-                <div>
+                <div className="mb-[22px]">
                   <SectionLabel>TIPO</SectionLabel>
                   <div className="flex flex-wrap gap-[9px]">
                     {POST_TYPES.map((postType) => (
@@ -167,7 +197,43 @@ export function NewPostButton() {
                   </div>
                 </div>
 
-                {/* DESCRIPCIÓN y FOTOS llegan en el paso 4 */}
+                <div className="mb-[22px]">
+                  <SectionLabel>DESCRIPCIÓN</SectionLabel>
+                  <textarea
+                    value={description}
+                    onChange={(event) => {
+                      setDescription(event.target.value);
+                      setError(null);
+                    }}
+                    placeholder="Contá cómo le fue hoy…"
+                    aria-invalid={Boolean(error)}
+                    className={`${textareaClasses(Boolean(error))} min-h-[120px] resize-y leading-[1.5]`}
+                  />
+                  {error && (
+                    <p className="mt-[7px] text-[12.5px] font-bold text-clay-dark">{error}</p>
+                  )}
+                </div>
+
+                <div>
+                  <SectionLabel>FOTOS</SectionLabel>
+                  <div className="flex gap-3">
+                    <div className="flex size-24 items-center justify-center rounded-cta border border-line bg-photo-bg text-chevron">
+                      <Icon size={26} strokeWidth={1.7}>
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <circle cx="9" cy="9" r="2" />
+                        <path d="m21 15-3.6-3.6a2 2 0 0 0-2.8 0L6 21" />
+                      </Icon>
+                    </div>
+                    <div className="flex size-24 flex-col items-center justify-center gap-[6px] rounded-cta border-[1.5px] border-dashed border-photo-border bg-photo-bg text-photo-text">
+                      <span className="text-clay-deep">
+                        <Icon size={22} strokeWidth={2}>
+                          <path d="M12 5v14M5 12h14" />
+                        </Icon>
+                      </span>
+                      <span className="text-[12px]">Agregar</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>,
