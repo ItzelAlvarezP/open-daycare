@@ -56,22 +56,22 @@ Primer nombre e inicial se derivan de `fullName` (`fullName.split(" ")[0]`); ava
 
 ## Acceptance criteria
 
-- [ ] El CTA «Nueva publicación» del sidebar abre el modal (backdrop + tarjeta centrada) sin cambiar de URL, desde cualquier página del shell.
-- [ ] La tarjeta replica el mockup: fondo `#FBF4EC`, borde `#ECE0D0`, radio 24px, sombra y ancho 580px; header con «Cancelar» `#94887B` / «Nueva publicación» en Fredoka / «Publicar» `#D9583C`.
-- [ ] PARA muestra chips de los 8 niños con primer nombre, inicial y colores de avatar del mock; Mateo llega seleccionado.
-- [ ] Las chips PARA conmutan entre estilo seleccionado (`#3F362E` + blanco) y no seleccionado (`#FFFDF9` + borde `#ECE0D0` + texto `#6E6359`).
-- [ ] «Toda la sala» marca a todos con un clic, los desmarca con otro, y se ve seleccionada solo cuando todos están marcados.
-- [ ] TIPO muestra las 7 chips con sus pares de color; la selección es única, llega en Actividad, y la activa usa fondo sólido + texto blanco.
-- [ ] DESCRIPCIÓN entra vacía con placeholder «Contá cómo le fue hoy…» y los estilos del mockup.
-- [ ] FOTOS muestra los dos tiles estáticos; «Agregar» no hace nada.
-- [ ] Publicar con descripción vacía o solo espacios mantiene el modal y muestra el error inline (texto `clay-dark` + borde `clay`); escribir lo limpia.
-- [ ] Publicar con descripción válida cierra el modal sin guardar ni crear posts.
-- [ ] Cancelar, backdrop y Esc cierran sin validar; al reabrir: Mateo, Actividad, descripción vacía y sin errores.
-- [ ] El scroll del fondo queda bloqueado con el modal abierto y se restaura al cerrar.
-- [ ] El resto del sidebar y de las páginas no cambia.
-- [ ] Bajo 640px el modal es completo y usable, con márgenes de 24px y sin cortes.
-- [ ] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan.
-- [ ] Capturas Playwright en `.playwright-mcp/` (desktop, error y mobile) comparadas con el mockup.
+- [x] El CTA «Nueva publicación» del sidebar abre el modal (backdrop + tarjeta centrada) sin cambiar de URL, desde cualquier página del shell. — ✅ Playwright: abre desde `/` y desde `/children/mateo-fernandez`; `location.pathname` sin cambio y modal presente en ambos (`document.body` contiene el portal `fixed inset-0`). Capturas `.playwright-mcp/crear-publicacion.png` y `.playwright-mcp/crear-publicacion-perfil.png`.
+- [x] La tarjeta replica el mockup: fondo `#FBF4EC`, borde `#ECE0D0`, radio 24px, sombra y ancho 580px; header con «Cancelar» `#94887B` / «Nueva publicación» en Fredoka / «Publicar» `#D9583C`. — ✅ Estilos computados: ancho `580px`, fondo `rgb(251,244,236)`, borde `1px rgb(236,224,208)`, radio `24px`, sombra con blur `20px 50px`; Cancelar `rgb(148,136,123)`/700, título Fredoka 600/18px `rgb(63,54,46)`, Publicar `rgb(217,88,60)`/800. Comparación visual con `.playwright-mcp/crear-publicacion-mockup.png`.
+- [x] PARA muestra chips de los 8 niños con primer nombre, inicial y colores de avatar del mock; Mateo llega seleccionado. — ✅ Probe: 8 chips (Mateo, Sofía, Benjamín, Valentina, Tomás, Emma, Lucas, Olivia) con iniciales M/S/B/V/T/E/L/O y avatares del mock (p. ej. Mateo `rgb(169,217,232)`/`rgb(31,122,147)`, Valentina `rgb(244,220,142)`/`rgb(154,123,30)`); `selected: true` solo en Mateo.
+- [x] Las chips PARA conmutan entre estilo seleccionado (`#3F362E` + blanco) y no seleccionado (`#FFFDF9` + borde `#ECE0D0` + texto `#6E6359`). — ✅ Computed: Mateo seleccionada `rgb(63,54,46)` + texto blanco; Sofía sin marcar `rgb(255,253,249)` / borde `rgb(236,224,208)` / texto `rgb(110,99,89)`.
+- [x] «Toda la sala» marca a todos con un clic, los desmarca con otro, y se ve seleccionada solo cuando todos están marcados. — ✅ Playwright: 1er clic → `selectedCount: 8` y chip oscura; 2do clic → `selectedCount: 0` y chip clara; con solo Mateo marcado queda clara.
+- [x] TIPO muestra las 7 chips con sus pares de color; la selección es única, llega en Actividad, y la activa usa fondo sólido + texto blanco. — ✅ Probe: 7 chips; inicial Actividad sólida `rgb(46,137,166)` + blanco; Comida suave `rgb(247,231,166)`/`rgb(154,123,30)`; al elegir Logro, Logro pasa a sólida `rgb(62,155,108)`+blanco y Actividad vuelve a suave `rgb(199,231,241)`/`rgb(46,137,166)`; Siesta suave `rgb(231,220,246)`/`rgb(123,95,192)` (tras limpiar cache de Turbopack del dev server).
+- [x] DESCRIPCIÓN entra vacía con placeholder «Contá cómo le fue hoy…» y los estilos del mockup. — ✅ Computed: `value: ""`, placeholder exacto, `min-height: 120px`, fondo blanco, borde `rgb(234,223,208)`, radio `14px`, fuente `15px`.
+- [x] FOTOS muestra los dos tiles estáticos; «Agregar» no hace nada. — ✅ DOM: 2 tiles de 96px (`size-24`), preview con icono cámara y tile «Agregar» punteado; en el código son `<div>` sin handlers (estáticos por diseño).
+- [x] Publicar con descripción vacía o solo espacios mantiene el modal y muestra el error inline (texto `clay-dark` + borde `clay`); escribir lo limpia. — ✅ Playwright: con vacío el modal permanece y aparece «Completá este campo.» en `rgb(217,88,60)` con borde `rgb(224,101,74)`; al escribir, `errorGone: true` y borde restaurado `rgb(234,223,208)`. Captura `.playwright-mcp/crear-publicacion-error.png`.
+- [x] Publicar con descripción válida cierra el modal sin guardar ni crear posts. — ✅ Playwright: modal cerrado, URL `/`, portal ausente del DOM y sin navegación.
+- [x] Cancelar, backdrop y Esc cierran sin validar; al reabrir: Mateo, Actividad, descripción vacía y sin errores. — ✅ Playwright: las tres vías cierran; probe al reabrir: `mateoDark: true`, `actividadSolid: true`, `taEmpty: true`, `noError: true`.
+- [x] El scroll del fondo queda bloqueado con el modal abierto y se restaura al cerrar. — ✅ `document.body.style.overflow === "hidden"` abierto y `""` al cerrar (verificado tras Cancelar, backdrop, Esc y Publicar).
+- [x] El resto del sidebar y de las páginas no cambia. — ✅ El diff solo toca `globals.css` (+2 tokens), `new-post-modal.tsx` (nuevo) y el `<a href="#">` del CTA en `app-sidebar.tsx`; capturas muestran sidebar, nav y feed intactos.
+- [x] Bajo 640px el modal es completo y usable, con márgenes de 24px y sin cortes. — ✅ Playwright a 500×800: tarjeta 452px con 24px por lado, backdrop `overflow-y: auto`, contenido completo. Captura `.playwright-mcp/crear-publicacion-mobile.png`.
+- [x] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan. — ✅ Los tres pasaron tras el último cambio de código; build prerenderizó 16/16 rutas.
+- [x] Capturas Playwright en `.playwright-mcp/` (desktop, error y mobile) comparadas con el mockup. — ✅ `crear-publicacion.png` (desktop, CSS correcto), `crear-publicacion-error.png`, `crear-publicacion-mobile.png`, `crear-publicacion-mockup.png` (referencia servida por HTTP) y `crear-publicacion-perfil.png`; comparación visual confirma layout, copy y estilos equivalentes.
 
 ## Decisions
 
