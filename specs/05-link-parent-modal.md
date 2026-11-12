@@ -53,21 +53,21 @@ El nombre del niño se obtiene del `MockChild` ya usado por la ruta dinámica de
 
 ## Acceptance criteria
 
-- [ ] En cualquier `/children/[childId]`, pulsar «Vincular otro padre» abre el modal sobre el perfil sin cambiar la URL.
-- [ ] El modal reproduce la estructura, copy, colores, tipografía, bordes y sombras de `references/pantallas/vincular-padre.dc.html`.
-- [ ] El encabezado y el aviso muestran el nombre del niño del perfil activo, no un nombre fijo.
-- [ ] Se muestran los dos campos con labels y placeholders especificados, y las tres opciones de parentesco con «Mamá» seleccionada inicialmente.
-- [ ] El código mostrado es `7K4P9` y el vencimiento dice «Vence en 7 días».
-- [ ] Enviar con nombre o email vacío mantiene abierto el modal y muestra el error correspondiente inline.
-- [ ] Enviar con email de formato inválido mantiene abierto el modal y muestra un error inline en email.
-- [ ] Corregir un campo con error elimina su mensaje y borde de error.
-- [ ] Enviar con nombre y email válidos cierra el modal; no crea ni modifica padres, invitaciones o datos persistentes.
-- [ ] X, clic en backdrop y Esc cierran sin validar; al reabrir, nombre y email están vacíos, «Mamá» seleccionada y sin errores.
-- [ ] El scroll del fondo queda bloqueado mientras el modal está abierto y se restaura al cerrarlo.
-- [ ] En viewport estrecho, la tarjeta mantiene 24px de margen lateral y el contenido puede desplazarse sin quedar cortado.
-- [ ] «Editar», «Resumen del día» y el resto del perfil mantienen su comportamiento y presentación actuales.
-- [ ] `npm run lint`, `npx tsc --noEmit` y `npm run build` terminan correctamente.
-- [ ] Las capturas de verificación se guardan bajo `.playwright-mcp/` y muestran el modal en desktop y viewport estrecho.
+- [x] En cualquier `/children/[childId]`, pulsar «Vincular otro padre» abre el modal sobre el perfil sin cambiar la URL.
+- [x] El modal reproduce la estructura, copy, colores, tipografía, bordes y sombras de `references/pantallas/vincular-padre.dc.html`.
+- [x] El encabezado y el aviso muestran el nombre del niño del perfil activo, no un nombre fijo.
+- [x] Se muestran los dos campos con labels y placeholders especificados, y las tres opciones de parentesco con «Mamá» seleccionada inicialmente.
+- [x] El código mostrado es `7K4P9` y el vencimiento dice «Vence en 7 días».
+- [x] Enviar con nombre o email vacío mantiene abierto el modal y muestra el error correspondiente inline.
+- [x] Enviar con email de formato inválido mantiene abierto el modal y muestra un error inline en email.
+- [x] Corregir un campo con error elimina su mensaje y borde de error.
+- [x] Enviar con nombre y email válidos cierra el modal; no crea ni modifica padres, invitaciones o datos persistentes.
+- [x] X, clic en backdrop y Esc cierran sin validar; al reabrir, nombre y email están vacíos, «Mamá» seleccionada y sin errores.
+- [x] El scroll del fondo queda bloqueado mientras el modal está abierto y se restaura al cerrarlo.
+- [x] En viewport estrecho, la tarjeta mantiene 24px de margen lateral y el contenido puede desplazarse sin quedar cortado.
+- [x] «Editar», «Resumen del día» y el resto del perfil mantienen su comportamiento y presentación actuales.
+- [x] `npm run lint`, `npx tsc --noEmit` y `npm run build` terminan correctamente.
+- [x] Las capturas de verificación se guardan bajo `.playwright-mcp/` y muestran el modal en desktop y viewport estrecho.
 
 ## Decisions
 
