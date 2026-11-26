@@ -1,6 +1,6 @@
 # SPEC 08 — Tabla `users`, enums y alta de usuario staff
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 07 — Tabla `daycares` (necesaria para el FK `users.daycare_id`)
 > **Fecha:** 2026-11-12
 > **Objetivo:** Crear la tabla `users` con sus enums (`user_role`, `user_status`), el trigger de perfil sobre `auth.users`, RLS por rol/guardería, y dar de alta un usuario staff de prueba vía SQL por MCP, siguiendo el doc de referencia `../07-DB-Schema/opendaycare-database-schema.md`.
@@ -183,7 +183,7 @@ Convenciones del doc: PK uuid default `gen_random_uuid()` (aquí la aporta `auth
 - [x] `list_migrations` muestra la migración `create_users_table` aplicada.
   > ✅ MCP `list_migrations` → versión `20261112205420`, name `create_users_table` (última de las 4 registradas).
 - [x] El SQL completo vive versionado en `supabase/migrations/<versión>_create_users_table.sql` y coincide con lo aplicado.
-  > ✅ `supabase/migrations/20261112205420_create_users_table.sql` (106 líneas); MD5 del fichero = `065745d432539289b04a3e063868cb72` = `md5(btrim(statements[1], chr(10)))` en `supabase_migrations.schema_migrations`. El array del historial solo añade `\n` delimitadores inicial/final.
+  > ✅ `supabase/migrations/20261112205420_create_users_table.sql` (106 líneas); MD5 del fichero sin el `\n` final = `065745d432539289b04a3e063868cb72` = `md5(btrim(statements[1], chr(10)))` en `supabase_migrations.schema_migrations` (MD5 del fichero crudo: `fe8722830f46fb4adf5075c71487bc2a`). El historial solo añade `\n` delimitadores inicial/final.
 - [x] `unnest(enum_range(null::public.user_role))` devuelve exactamente `staff`, `parent`, `admin`; y `user_status` exactamente `pending`, `active`.
   > ✅ `execute_sql` → `enum_user_role: staff,parent,admin`; `enum_user_status: pending,active`.
 - [x] `information_schema.columns` confirma `public.users` con exactamente las columnas `id`, `daycare_id`, `role`, `status`, `full_name`, `avatar_url`, `notify_on_post`, `daily_summary_enabled`, `created_at`, `updated_at` con sus tipos/nullable/default según el data model.
@@ -193,19 +193,19 @@ Convenciones del doc: PK uuid default `gen_random_uuid()` (aquí la aporta `auth
 - [x] `pg_trigger` contiene `on_auth_user_created` sobre `auth.users` y `users_updated_at` sobre `public.users` (moddatetime).
   > ✅ `on_auth_user_created` en `auth.users`; `users_updated_at` en `public.users` ejecuta `public.moddatetime`.
 - [x] Alta del staff vía SQL → el trigger crea la fila en `public.users` con `role = 'staff'`, `status = 'active'`, `full_name = 'Docente Soles'` y el `daycare_id` de «Guardería Sala Soles» (verificado con join a `daycares`).
-  > ✅ Fila de `staff.soles@opendaycare.test`: `role=staff`, `status=active`, `full_name='Docente Soles'`, join a `daycares` → `Guardería Sala Soles`.
+  > ✅ Fila de `staff.soles@opendaycare.test`: `role=staff`, `status=active`, `full_name='Docente Soles'`, join a `daycares` → `Guardería Sala Soles`. Revalidado con un insert transaccional (rollback): app_metadata con `role=staff` → perfil `staff`/`active`/`Verifier Soles` en la misma guardería; al borrar el usuario Auth, 0 perfiles por cascade.
 - [x] Alta de un usuario Auth sin `role` en `raw_app_meta_data` → perfil creado con `role = 'parent'` (fallback); su delete en `auth.users` borra el perfil por cascade.
-  > ✅ Test transaccional con `rollback`: app_metadata sin `role` → perfil `parent`/`active`/`Parent Fallback Test` (Guardería Estrellitas); `delete from auth.users` → 0 perfiles tras cascade.
+  > ✅ Test transaccional con `rollback`: `verifier.fallback@opendaycare.test` con app_metadata sin `role` → perfil `parent`/`active`/`Fallback Verifier` (Guardería Estrellitas); `delete from auth.users` → 0 perfiles y 0 usuarios Auth residuales.
 - [x] Insert en `auth.users` sin `daycare_id` en metadata falla con la exception `Signup requires daycare_id in metadata` (probado dentro de una transacción con `rollback`).
-  > ✅ Error `P0001: Signup requires daycare_id in metadata` (contexto `private.handle_new_user() line 15`); sin filas residuales de `auth.users` ni `public.users` tras el fallo.
+  > ✅ Test transaccional (rollback) con `verifier.nodaycare@opendaycare.test`: error `P0001: Signup requires daycare_id in metadata`; 0 filas residuales en `auth.users` y `public.users` tras el fallo.
 - [x] Con `set local role anon`, `select count(*) from public.users` devuelve 0 (RLS bloquea al anónimo).
   > ✅ `begin; set local role anon; select count(*)` → `0`; `rollback`.
 - [x] Con `set local role authenticated` + `request.jwt.claims` del staff, `select` sobre `public.users` devuelve su fila y las de su guardería, y ninguna de otra guardería.
-  > ✅ Sesión simulada del staff → solo su fila (Guardería Sala Soles); el padre de Guardería Estrellitas (otra guardería) no aparece.
+  > ✅ Sesión simulada del staff (`request.jwt.claims` con su UUID) → solo su fila (Guardería Sala Soles), 0 de Guardería Estrellitas. Con un compañero añadido transaccionalmente en Sala Soles, la vista del staff devuelve 2 filas (`Docente Soles`, `Peer Soles`) y ninguna de otra guardería; rollback posterior.
 - [x] Con la sesión simulada del staff, `update public.users set role = 'admin' where id = <staff>` falla con error de RLS (`42501`, violación de `WITH CHECK`), y un `update ... set full_name` propio sí funciona moviendo `updated_at` (trigger moddatetime).
-  > ✅ `update set role='admin'` → `42501: new row violates row-level security policy for table "users"` (WITH CHECK); `update set full_name` OK con `updated_at > created_at` (moddatetime); el `rollback` restauró el valor.
+  > ✅ `update set role='admin'` → `42501: new row violates row-level security policy for table "users"` (WITH CHECK); `update set full_name` OK y `updated_at` pasó de `2026-11-12 20:58:21.12284+00` a `2026-11-26 19:10:43.968937+00` (moddatetime); el `rollback` restauró nombre y timestamp.
 - [x] `set local role anon` / `authenticated` no puede usar el schema `private` (`permission denied`) y `get_advisors` (security) no reporta issues críticos nuevos derivados de esta migración.
-  > ✅ `anon` y `authenticated` → `42501: permission denied for schema private`. `get_advisors` (security): 4 WARN, 0 críticos. Único derivado de esta migración: `extension_in_public` (WARN, `moddatetime` en `public`; mover a schema `extensions` en una futura migración). Los otros 3 (`rls_auto_enable` ×2, leaked password protection) son previos.
+  > ✅ `private.current_user_role()` con `set local role anon` / `authenticated` → `42501: permission denied for schema private` en ambos casos (schema ACL: solo `postgres=UC`). `get_advisors` (security) revalidado: 4 WARN, 0 críticos. Único derivado de esta migración: `extension_in_public` (WARN, `moddatetime` en `public`; mover a schema `extensions` en una futura migración). Los otros 3 (`rls_auto_enable` ×2, leaked password protection) son previos.
 
 ## Decisions
 

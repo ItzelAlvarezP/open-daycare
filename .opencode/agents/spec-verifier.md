@@ -1,7 +1,7 @@
 ---
 description: Verifica el checklist "Acceptance criteria" de un spec de specs/ y marca los checks con evidencia
 mode: all
-model: opencode/glm-5.3
+model: opencode/big-pickle
 permissions:
   - action: edit
     resource: "*"
