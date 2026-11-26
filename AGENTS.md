@@ -60,11 +60,13 @@ Daycare communication app: teachers publish posts (activity / achievement / noti
 
 ## Spec workflow
 
-- User-driven: `/spec <description>` writes `specs/NN-slug.md` (`specs/` does not exist yet); `/spec-impl <NN-slug>` implements it step by step on branch `spec-NN-slug`, only if the spec state means Approved/Aprobado, and never commits autonomously.
+- User-driven: `/spec <description>` writes `specs/NN-slug.md`; `/spec-impl <NN-slug>` implements it step by step on branch `spec-NN-slug`, only if the spec state means Approved/Aprobado, and never commits autonomously.
+- **Especificaciones de base de datos:** todo spec que trate de Supabase/Postgres (tablas, columnas, migraciones, RLS, índices, triggers, funciones, seeds o esquema) se guarda en `specs/database/NN-slug.md`, nunca en la raíz de `specs/`. Esta regla prevalece sobre la ruta por defecto que indique la skill `/spec`, que lee este archivo antes de escribir.
+- La numeración `NN` es única y continua en ambos directorios: para crear un spec, toma el número más alto existente en `specs/` **y** `specs/database/` y súmale uno, con dos dígitos (p. ej. `01`–`06` en `specs/`, `07`–`08` en `specs/database/`, el siguiente es `09`). `/spec-impl` y el verificador buscan el spec en ambas carpetas.
 - Skills vendidas en `.agents/skills/` (pinned by `skills-lock.json`):
   - `spec` / `spec-impl` (from GitHub `Klerith/fernando-skills`) are user-invoked only (`disable-model-invocation: true`).
   - `supabase` / `supabase-postgres-best-practices` (from GitHub `supabase/agent-skills`) are model-invocable: load them for any Supabase/Postgres task (see below).
-- Agent `spec-verifier` (`.opencode/agents/spec-verifier.md`): given a spec (number, slug or full name), it verifies each **Acceptance criteria** item (commands, static code via Read/Grep, visual via Playwright + Context7 for Next.js checks) and marks the spec's checks `[x]`/`[ ]` with evidence. It only edits `specs/**` — fixes go through `/spec-impl`, and it never commits.
+- Agent `spec-verifier` (`.opencode/agents/spec-verifier.md`): given a spec (number, slug or full name), it verifies each **Acceptance criteria** item (commands, static code via Read/Grep, visual via Playwright + Context7 for Next.js checks) and marks the spec's checks `[x]`/`[ ]` with evidence. It only edits `specs/**` (incluido `specs/database/**`) — fixes go through `/spec-impl`, and it never commits.
 
 ## Playwright
 
